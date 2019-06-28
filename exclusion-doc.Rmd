@@ -10,6 +10,34 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+# Meeting Magnus-Thore June 28
+
+Below some are some suggestions for  the `shiny-gui`.
+
+1. Name (cf. Kanban board; not sure if/how one comments directly on the board.)
+We suggest epGUI (short for exclusionPowerGUI). 
+2. It would be nice to have the plots of the pedigrees available at all times.
+The Save/load work space square could move down right
+and plots could be to the left.
+3. The could be a `Settings`, say to the left of `Results`. Some parameters
+(like `inbreeding parameters`, search founderInbreeding below for an example, `mutation model` and X/autosomal could
+be set. It's not obvious what goes here and what goes in the specific windows.
+Perhaps there should be choice for exact calculation (default) and/or simulation.)  
+4.Genetic data. Allele designations, frequencies. The current version is fine,
+but could be more general (eg., the ped-suite allows one allele to be missing)
+and Magnus will, as he has planned before this project, implement a `readTable` function. This file could then be edited.
+5. Genetic data. Reference profiles. Not yet implemented. These are marker data specified by the `known` parameter of `exclusionPower` and exemplified below.
+We suggest that this rather be added as columns in the claimPed-file
+(any such data in the claimTrue ped file can be ignored)
+as exemplified in example-sister-more/sister-known.ped.
+There are various ways to enter alleles that will be handled by the mentioned `readTable` function. For the X-chromosome, there will be at most one allele for males.
+6. A long term goal would be to read the export from Windows Familias.
+7. Plotting of unrelated does not work. This plotting is a bit awkward and not supported by
+`kinship2`. A possibility:
+
+```{r, echo = TRUE, eval = FALSE}
+pedtools::plotPedList(list(singleton(3,1), singleton(4,2)), frames = F)
+```
 
 # Status
 
