@@ -1,0 +1,5 @@
+Sample id	AMEL 1	AMEL 2	M1 1	M1 2	M2 1	M2 2	
+1	X	Y	1	2	3	3	
+2	X	X	 	 	 	 	
+3	X	X	 	 	 	 	
+4	X	X	 	 	 	 	
