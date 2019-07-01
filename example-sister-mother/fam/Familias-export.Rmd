@@ -1,0 +1,47 @@
+---
+title: "Handling Export from Windows Familias?"
+author: "Thore"
+date: "1 7 2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The files referred to below are in
+<https://github.com/thoree/exclusion/tree/master/example-sister-mother/fam>.
+
+The file `Familias-general-DNA-data.txt` is exported from
+the `General DNA data` of Familias. It gives allele designations and
+frequencies, but not more, and so mutation models etc are not there.
+
+The file `Familias-case-data.txt` is exported from the `Case DNA data`
+of Familias. It gives name and sex of individuals and 
+possible genotypes.
+
+It's also possible to export the Familias project and then
+mutation models, parameters and pedigrees will also be included. 
+Here's an example of loading a project exported from
+Windows Familias and how it's converted to ped-suite format.
+
+```{r, echo = TRUE, eval = TRUE}
+source("Familias.R") # Loads exported from Familias.fam, kinship2 plots
+library(forrel)
+# Convert to ped-suite format
+x = Familias2ped(pedigrees, datamatrix, loci)
+# The pedigrees
+(claim = x[[1]])
+(true = x[[2]])
+plotPedList(list(claim, true))
+
+# Marker - and genotype data
+x[[2]]$markerdata 
+# or
+x[[1]][[1]]$markerdata
+# x[[1]] is a list of two singletons and a pedigree
+# and so the following does not work
+x[[1]]$markerdata
+```
