@@ -10,7 +10,46 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-# Meeting Magnus-Thore June 28
+
+# July 6: Missing Grandchild example
+
+Below is a more complex example based
+on the Argentina paper, see Figure 6, Kling et al (2017).
+The pedigrees are larger and a mutation is required
+given that relationships among genotyped individuals are
+as reported; aa reasonable assuption since only one mutation 
+in 24 markers is required.
+The data is in https://github.com/thoree/exclusion/F21.
+Below are some example commands
+
+```{r, echo = TRUE, eval = FALSE}
+
+# The data has been exported from Windows Familias
+# and converted using Familias2ped. Then it was
+# saved. Below it's loaded and some examples
+# are shown based only on the 5 markers published
+
+load("exampleA3.RData") 
+x = exampleA3
+claim = x[[1]][[1]] # remove singleton, just for first plot
+dev.new(height = 9, width = 9, noRStudioGD = TRUE)
+plot(claim, marker = 1:5, cex = 0.8,  skip.empty.genotypes = TRUE,
+     shaded = 1:5, col = list(red = "POI"),
+     title = "Fig 6, H1, Argentina- paper, Kling et al., 2017")
+true = x[[2]]
+PE1 = exclusionPower(claim, true, ids = "POI", markerindex = 1)
+
+nMarkers = 5
+PE = rep(NA, nMarkers)
+for (i in 1:nMarkers)
+  PE[i] = exclusionPower(claim, true, ids = "POI", markerindex = i, plot = FALSE)
+PE.all = 1 - prod(1-PE)
+c("PE = " = PE.all)
+```
+
+
+
+# June 28 2019: Meeting Magnus-Thore 
 
 Below some are some suggestions for  the `shiny-gui`.
 
