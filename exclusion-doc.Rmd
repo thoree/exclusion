@@ -11,45 +11,9 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# July 6: Missing Grandchild example
-
-Below is a more complex example based
-on the Argentina paper, see Figure 6, Kling et al (2017).
-The pedigrees are larger and a mutation is required
-given that relationships among genotyped individuals are
-as reported; aa reasonable assuption since only one mutation 
-in 24 markers is required.
-The data is in https://github.com/thoree/exclusion/F21.
-Below are some example commands
-
-```{r, echo = TRUE, eval = FALSE}
-
-# The data has been exported from Windows Familias
-# and converted using Familias2ped. Then it was
-# saved. Below it's loaded and some examples
-# are shown based only on the 5 markers published
-
-load("exampleA3.RData") 
-x = exampleA3
-claim = x[[1]][[1]] # remove singleton, just for first plot
-dev.new(height = 9, width = 9, noRStudioGD = TRUE)
-plot(claim, marker = 1:5, cex = 0.8,  skip.empty.genotypes = TRUE,
-     shaded = 1:5, col = list(red = "POI"),
-     title = "Fig 6, H1, Argentina- paper, Kling et al., 2017")
-true = x[[2]]
-PE1 = exclusionPower(claim, true, ids = "POI", markerindex = 1)
-
-nMarkers = 5
-PE = rep(NA, nMarkers)
-for (i in 1:nMarkers)
-  PE[i] = exclusionPower(claim, true, ids = "POI", markerindex = i, plot = FALSE)
-PE.all = 1 - prod(1-PE)
-c("PE = " = PE.all)
-```
 
 
-
-# June 28 2019: Meeting Magnus-Thore 
+## June 28 2019: Meeting Magnus-Thore 
 
 Below some are some suggestions for  the `shiny-gui`.
 
@@ -78,13 +42,13 @@ There are various ways to enter alleles that will be handled by the mentioned `r
 pedtools::plotPedList(list(singleton(3,1), singleton(4,2)), frames = F)
 ```
 
-# Status
+## Status
 
 The shiny app can be installed and run:
 
 ```{r, echo = TRUE, eval = FALSE}
 devtools::install_github('magnusdv/forrel', ref = 'shiny-gui')
-forrel::launchGUI()
+forrel::epGUI()
 ```
 
 This document and some examples are available at
@@ -114,7 +78,7 @@ and that simulation using minx <http://csg.sph.umich.edu/abecasis/merlin/referen
 gives a number of databases for X-chromosomal markers.
 
 
-# Goal, papers
+## Goal, papers
 
 The goal for the project is to make a nice interface to
 the R function `exclusionPower` to be used primarly by forensic case workers 
@@ -136,7 +100,7 @@ There is also a poster
 
 * Exclusion_poster2012.pdf
 
-# Examples
+## Examples
 
 The current version of Magnus' function is in the `forrel` 
 library, installed from GitHub as follows.
@@ -511,6 +475,60 @@ PE.formel = (1-f)*q^2*(1-q)^2
 c(PE, PE.formel)
 ```
 
+## Example 6: Mutation
 
+The mother and child are genotyped, but there
+is a mutation. Exclusion power for the father is required.
+The answers are checked against formulae.
+
+```{r, echo = TRUE, eval = TRUE}
+x1 = pedtools::nuclearPed(1, father = "AF", mother = "MO", children = "CH")
+als = 1:3
+p = c(1,2,3)/6
+M1 = matrix(c(0.99, 0.01, 0.00,
+             0.01, 0.99, 0.00,
+             0.00, 0.00, 1.00), 
+           ncol = 3, dimnames = list(1:3, 1:3))
+mut = pedmut::mutationMatrix(model = "custom", matrix = M1)
+m = pedtools::marker(x1, alleles = als, afreq = p, mutmod = mut, 
+                     "MO" = 1, "CH" = 2)
+claim = pedtools::addMarkers(x1, m) 
+x2 = pedtools::singleton("AF")
+x3 = pedtools::nuclearPed(1, father ="TF", mother = "MO", children = "CH")
+true = list(x2, x3)
+PE1 = forrel::exclusionPower(claim, true, ids = "AF", markerindex = 1, 
+                             plot = FALSE, verbose = F)
+stopifnot(PE1 == p[3]^2)
+
+# If all entries of the mutation matrix are positive,
+# exclusion should be impossible: 
+
+mut =  pedmut::mutationModel(model = "equal",  
+            alleles = als, afreq = p, rate = 0.01)
+m = pedtools::marker(x1, alleles = als, afreq = p, mutmod = mut, 
+                     "MO" = 1, "CH" = 2)
+claim = pedtools::setMarkers(claim, m) 
+PE2 = forrel::exclusionPower(claim, true, ids = "AF", markerindex = 1, 
+                             plot = FALSE, verbose = FALSE)
+stopifnot(PE2 == 0)
+```
+Consider next a strange mutation matrix, making the mother impossible
+The likelihood of the data is 0 for  `true` 
+and an error message is reported as warranted:
+
+```{r, echo = TRUE, eval = FALSE}
+M2 = matrix(c(1.00, 0.00, 0.00,
+              0.00, 0.99, 0.01,
+              0.00, 0.01, 0.99), 
+           ncol = 3, dimnames = list(1:3, 1:3))
+mut = pedmut::mutationMatrix(model = "custom", matrix = M2)
+m = pedtools::marker(x1, alleles = als, afreq = p, mutmod = mut, 
+                     "MO" = 1, "CH" = 2)
+
+claim = pedtools::setMarkers(claim, m) 
+true = list(x2, x3)
+forrel::exclusionPower(claim, true, ids = "AF", markerindex = 2, 
+                             plot = FALSE)
+```
 
 
