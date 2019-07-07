@@ -3,8 +3,8 @@ title: 'Project: exclusionPower'
 author: "Thore, Elias and Magnus"
 date: "`r Sys.setlocale('LC_TIME','C'); paste('Created: ', format(Sys.Date(), '%b %d, %Y'))`"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
