@@ -527,8 +527,8 @@ m = pedtools::marker(x1, alleles = als, afreq = p, mutmod = mut,
 
 claim = pedtools::setMarkers(claim, m) 
 true = list(x2, x3)
-forrel::exclusionPower(claim, true, ids = "AF", markerindex = 2, 
-                             plot = FALSE)
+forrel::exclusionPower(claim, true, ids = "AF", markerindex = 1, 
+                             plot = 'FALSE')
 ```
 
 
