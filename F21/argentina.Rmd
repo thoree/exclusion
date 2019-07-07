@@ -1,0 +1,103 @@
+---
+title: 'Project: exclusionPower'
+author: "Thore, Elias and Magnus"
+date: "`r Sys.setlocale('LC_TIME','C'); paste('Created: ', format(Sys.Date(), '%b %d, %Y'))`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Missing Grandchild Example
+
+Below is an example based
+on the Argentina paper, see Figure 6, Kling et al (2017),
+https://github.com/thoree/exclusion/blob/master/F21/Kling-missing-PIIS1872497317301758.pdf.
+The pedigrees are larger than usual, parents of PO typically not available,
+and mutations happen.
+Files are in in https://github.com/thoree/exclusion/tree/master/F21.
+The data has been exported from Windows Familias
+and converted using `forrel::Familias2ped`. Then it was
+saved using the R function `save`. Below it's loaded (I unsuccesfuly tried several 
+ways of direct load from github) and some examples
+are shown based on the 5 markers published
+
+```{r, echo = TRUE, eval = TRUE}
+load("exampleA3.RData")
+x = exampleA3
+library(forrel, quietly = TRUE)
+claim = x[[1]][[1]] # remove singleton, just for first plot
+knitr::opts_chunk$set(fig.width=12, fig.height=8) 
+plot(claim, marker = 1:2, cex = 0.8,  skip.empty.genotypes = TRUE,
+     shaded = 1:5, col = list(red = "POI"),
+     title = "Fig 6, H1, Argentina- paper, Kling et al., 2017")
+```
+
+Exclusion probability for first marker:
+
+```{r, echo = TRUE, eval = TRUE}
+claim = x[[1]]
+true = x[[2]]
+(PE = exclusionPower(claim, true, ids = "POI", markerindex = 1, 
+               verbose = FALSE))
+```
+
+Let's check the answer with some acrobatics, since
+`oneMarkerDistribution`does not accept lists:
+
+```{r, echo = TRUE, eval = TRUE}
+library(pedprobr)
+H2 = x[[2]][[1]]
+H2 = addChildren(H2, father = 2, mother = "POI", id = "NN", 
+                 verbose = FALSE)
+ptrue = oneMarkerDistribution(H2,ids = "POI", partialmarker = 1,
+                              verbose = F)
+
+H1 = x[[1]][[1]]
+pclaim = oneMarkerDistribution(H1,ids = "POI", partialmarker = 1,
+                              verbose = F)
+I1 = (pclaim == 0)
+PE.check = sum(I1*ptrue)
+c("PE = ", PE, "PE.check =", PE.check)
+```
+
+
+
+
+A closer look at the second marker: We see that there must be a mutation in `5`
+and mutations are modelled only for this marker. In this case, `the `proportional`
+model with mutation rate 0.005, was specified in Windows Familias.
+In the ped-suite, we can look at the mutation model (output omitted)
+
+```{r, echo = TRUE, eval = FALSE}
+library(pedmut)
+m = claim$markerdata[[2]]
+mutmod(m)
+```
+
+Exclusion probability for second marker
+(problem with `markerindex` see https://github.com/magnusdv/forrel/issues/23; skip the rest for now)
+
+```{r, echo = TRUE, eval = TRUE}
+exclusionPower(claim, true, ids = "POI", markerindex = 2, 
+               verbose = FALSE)
+```
+
+
+Exclusion probability for markers 1,2,3,4,5
+
+```{r, echo = TRUE, eval = TRUE}
+nMarkers = 5
+PE = rep(NA, nMarkers)
+for (i in 1:5)
+  PE[i] = exclusionPower(claim, true, ids = "POI", markerindex = i, plot = FALSE,
+                         verbose = FALSE)
+PE.all = 1 - prod(1-PE)
+c("PE = " = PE.all)
+```
+
+
+
