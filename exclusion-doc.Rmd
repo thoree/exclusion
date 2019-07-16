@@ -179,6 +179,12 @@ PE4 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters, ids = ids,
 
 stopifnot(round(c(PE1,PE2,PE3,PE4), 5) == c(0.03125, 0.00405, 0.08203, 0.03090))
 
+# Marker M2 in ep::GUI example
+foo = exclusionPower(ped_claim = mother_daughter, ped_true = sisters, ids = ids,
+                     alleles = 2:3, afreq = c(0.8, 0.2))
+fooX = exclusionPower(ped_claim = mother_daughter, ped_true = sisters, ids = ids,
+                     alleles = 2:3, afreq = c(0.8, 0.2), Xchrom = T)
+
 ####### How does the power change if the true pedigree is inbred?
 sisters_LOOP = addParents(sisters, 101, father = 201, mother = 202)
 sisters_LOOP = addParents(sisters_LOOP, 102, father = 201, mother = 203)
@@ -204,6 +210,8 @@ PE8 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP,
 stopifnot(round(c(PE7,PE8), 5) == c(0.07617, 0.03457))
 ```
 
+
+
 ## Example 2: Paternal half sisters
 
 This is an important special case: 
@@ -220,14 +228,14 @@ halfSisters = halfSibPed(sex1 = 2, sex2 = 2)
 unrelated = list(singleton(4, sex = 2), singleton(5, sex = 2))
 ids = c(4, 5)
 
-p1 = (1:4)/sum(1:4)
-als1 = 1:length(p1)
+p1 = c(0.5, 0.5)
+als1 = 1:2
 
 PE9.1 = exclusionPower(ped_claim = halfSisters, ped_true = unrelated, Xchrom = TRUE,
                      ids = ids, alleles = als1, afreq = p1)
 
-p2 = (1:10)/sum(1:10)
-als2 = 1:length(p2)
+p2 = c(0.8, 0.2)
+als2 = 2:3
 
 PE9.2 = exclusionPower(ped_claim = halfSisters, ped_true = unrelated, Xchrom = TRUE,
                      ids = ids, alleles = als2, afreq = p2, plot = FALSE)
