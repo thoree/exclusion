@@ -41,7 +41,7 @@ Exclusion probability for first marker:
 ```{r, echo = TRUE, eval = TRUE}
 claim = x[[1]]
 true = x[[2]]
-(PE = exclusionPower(claim, true, ids = "POI", markerindex = 1, 
+(PE1 = exclusionPower(claim, true, ids = "POI", markerindex = 1, 
                verbose = FALSE))
 ```
 
@@ -61,7 +61,7 @@ pclaim = oneMarkerDistribution(H1,ids = "POI", partialmarker = 1,
                               verbose = F)
 I1 = (pclaim == 0)
 PE.check = sum(I1*ptrue)
-c("PE = ", PE, "PE.check =", PE.check)
+c("PE1 = ", PE1, "PE.check =", PE.check)
 ```
 
 
@@ -74,7 +74,7 @@ In the ped-suite, we can look at the mutation model (output omitted)
 
 ```{r, echo = TRUE, eval = FALSE}
 library(pedmut)
-m = claim$markerdata[[2]]
+m = claim[[1]]$markerdata[[2]]
 mutmod(m)
 ```
 
