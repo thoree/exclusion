@@ -376,7 +376,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Project: exclusionPower</h1>
 <h4 class="author">Thore, Elias and Magnus</h4>
-<h4 class="date">Created: Jul 07, 2019</h4>
+<h4 class="date">Created: Jul 31, 2019</h4>
 
 </div>
 
@@ -396,7 +396,7 @@ plot(claim, marker = 1:2, cex = 0.8,  skip.empty.genotypes = TRUE,
 <p>Exclusion probability for first marker:</p>
 <pre class="r"><code>claim = x[[1]]
 true = x[[2]]
-(PE = exclusionPower(claim, true, ids = &quot;POI&quot;, markerindex = 1, 
+(PE1 = exclusionPower(claim, true, ids = &quot;POI&quot;, markerindex = 1, 
                verbose = FALSE))</code></pre>
 <pre><code>## [1] 0.5213632</code></pre>
 <p>Let’s check the answer with some acrobatics, since <code>oneMarkerDistribution</code>does not accept lists:</p>
@@ -412,17 +412,17 @@ pclaim = oneMarkerDistribution(H1,ids = &quot;POI&quot;, partialmarker = 1,
                               verbose = F)
 I1 = (pclaim == 0)
 PE.check = sum(I1*ptrue)
-c(&quot;PE = &quot;, PE, &quot;PE.check =&quot;, PE.check)</code></pre>
-<pre><code>## [1] &quot;PE = &quot;             &quot;0.521363167706383&quot; &quot;PE.check =&quot;       
+c(&quot;PE1 = &quot;, PE1, &quot;PE.check =&quot;, PE.check)</code></pre>
+<pre><code>## [1] &quot;PE1 = &quot;            &quot;0.521363167706383&quot; &quot;PE.check =&quot;       
 ## [4] &quot;0.521363167706383&quot;</code></pre>
 <p>A closer look at the second marker: We see that there must be a mutation in <code>5</code> and mutations are modelled only for this marker. In this case, <code>the</code>proportional` model with mutation rate 0.005, was specified in Windows Familias. In the ped-suite, we can look at the mutation model (output omitted)</p>
 <pre class="r"><code>library(pedmut)
-m = claim$markerdata[[2]]
+m = claim[[1]]$markerdata[[2]]
 mutmod(m)</code></pre>
 <p>Exclusion probability for second marker (problem with <code>markerindex</code> see <a href="https://github.com/magnusdv/forrel/issues/23" class="uri">https://github.com/magnusdv/forrel/issues/23</a>; skip the rest for now)</p>
 <pre class="r"><code>exclusionPower(claim, true, ids = &quot;POI&quot;, markerindex = 2, 
                verbose = FALSE)</code></pre>
-<pre><code>## [1] 0.5213632</code></pre>
+<pre><code>## [1] 0</code></pre>
 <p>Exclusion probability for markers 1,2,3,4,5</p>
 <pre class="r"><code>nMarkers = 5
 PE = rep(NA, nMarkers)
@@ -432,7 +432,40 @@ for (i in 1:5)
 PE.all = 1 - prod(1-PE)
 c(&quot;PE = &quot; = PE.all)</code></pre>
 <pre><code>##     PE =  
-## 0.9748794</code></pre>
+## 0.7920915</code></pre>
+</div>
+<div id="epgui-testing" class="section level2">
+<h2>epGUI testing</h2>
+<p>We start with some simplified test cases for the <code>epGUI</code>. Assume only 7 and POI will be genotyped and that no others are genotyped.</p>
+<pre class="r"><code>x = exampleA3
+for (i in 1:5){
+ genotype(x[[1]][[1]], &quot;D3S1358&quot;, i) = NA
+ genotype(x[[1]][[1]], &quot;TH01&quot;, i) = NA
+}
+claim = x[[1]]
+true = x[[2]]
+PE1 = exclusionPower(claim, true, ids = c(&quot;7&quot;, &quot;POI&quot;), markerindex = 1, 
+               verbose = FALSE,plot = F)
+mutmod(claim[[1]], marker = 2) = &quot;trivial&quot; #removes mutation
+PE2 = exclusionPower(claim, true, ids = c(&quot;7&quot;, &quot;POI&quot;), markerindex = 2, 
+               verbose = FALSE, plot = F)
+c(&quot;D3S1358&quot; = PE1, &quot;TH01&quot; = PE2)</code></pre>
+<pre><code>##   D3S1358      TH01 
+## 0.3534646 0.3720169</code></pre>
+<p>These numbers confirm epGUI output based on claim2.ped, true.ped and database.csv in <a href="https://github.com/thoree/exclusion/tree/master/F21/ep" class="uri">https://github.com/thoree/exclusion/tree/master/F21/ep</a></p>
+<p>Assume next 7 is genotyped</p>
+<pre class="r"><code>genotype(x[[1]][[1]], &quot;D3S1358&quot;, 7) = c(16, 16)
+genotype(x[[1]][[1]], &quot;TH01&quot;, 7) = c(6, 6)
+claim = x[[1]]
+mutmod(claim[[1]], marker = 2) = &quot;trivial&quot; #removes mutation
+true = x[[2]]
+PE1 = exclusionPower(claim, true, ids = c(&quot;7&quot;, &quot;POI&quot;), markerindex = 1, 
+               verbose = FALSE,plot = F)
+PE2 = exclusionPower(claim, true, ids = c(&quot;7&quot;, &quot;POI&quot;), markerindex = 2, 
+               verbose = FALSE, plot = F)
+c(&quot;D3S1358&quot; = PE1, &quot;TH01&quot; = PE2)</code></pre>
+<pre><code>##   D3S1358      TH01 
+## 0.5187540 0.4961653</code></pre>
 </div>
 
 

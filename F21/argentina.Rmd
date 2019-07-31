@@ -3,8 +3,8 @@ title: 'Project: exclusionPower'
 author: "Thore, Elias and Magnus"
 date: "`r Sys.setlocale('LC_TIME','C'); paste('Created: ', format(Sys.Date(), '%b %d, %Y'))`"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -99,5 +99,42 @@ PE.all = 1 - prod(1-PE)
 c("PE = " = PE.all)
 ```
 
+## epGUI testing
 
+We start with some simplified test cases for the `epGUI`.
+Assume only 7 and POI will be genotyped and that no others are genotyped.
 
+```{r, echo = TRUE, eval = TRUE}
+x = exampleA3
+for (i in 1:5){
+ genotype(x[[1]][[1]], "D3S1358", i) = NA
+ genotype(x[[1]][[1]], "TH01", i) = NA
+}
+claim = x[[1]]
+true = x[[2]]
+PE1 = exclusionPower(claim, true, ids = c("7", "POI"), markerindex = 1, 
+               verbose = FALSE,plot = F)
+mutmod(claim[[1]], marker = 2) = "trivial" #removes mutation
+PE2 = exclusionPower(claim, true, ids = c("7", "POI"), markerindex = 2, 
+               verbose = FALSE, plot = F)
+c("D3S1358" = PE1, "TH01" = PE2)
+```
+
+These numbers confirm epGUI output based on claim2.ped, true.ped and
+database.csv in
+https://github.com/thoree/exclusion/tree/master/F21/ep
+
+Assume next 7 is genotyped
+
+```{r, eval=T, echo=TRUE}
+genotype(x[[1]][[1]], "D3S1358", 7) = c(16, 16)
+genotype(x[[1]][[1]], "TH01", 7) = c(6, 6)
+claim = x[[1]]
+mutmod(claim[[1]], marker = 2) = "trivial" #removes mutation
+true = x[[2]]
+PE1 = exclusionPower(claim, true, ids = c("7", "POI"), markerindex = 1, 
+               verbose = FALSE,plot = F)
+PE2 = exclusionPower(claim, true, ids = c("7", "POI"), markerindex = 2, 
+               verbose = FALSE, plot = F)
+c("D3S1358" = PE1, "TH01" = PE2)
+```
